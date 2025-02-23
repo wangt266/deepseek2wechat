@@ -3,11 +3,19 @@ import xml.etree.ElementTree as ET
 import time
 from openai import OpenAI
 import os
+import requests
 
 app = Flask(__name__)
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")  # 从环境变量读取
+APP_ID = "wx8e06c94e001b2479"  # 替换
+APP_SECRET = "vercel2deepseek"  # 替换
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+
+def get_access_token():
+    url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={APP_ID}&secret={APP_SECRET}"
+    response = requests.get(url).json()
+    return response.get("access_token")
 
 @app.route('/wechat', methods=['GET', 'POST'])
 def wechat():
@@ -34,7 +42,7 @@ def wechat():
         )
         ai_reply = response.choices[0].message.content
     except Exception as e:
-        ai_reply = "抱歉，我遇到点问题，请稍后再试！"
+        ai_reply = f"错误: {str(e)}"
 
     reply_xml = f"""
     <xml>
@@ -48,5 +56,5 @@ def wechat():
     return Response(reply_xml, mimetype='application/xml')
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))  # Vercel 用 PORT，默认 5000
+    port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
