@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 
-DEEPSEEK_API_KEY = os.getenv("c5246d28-436b-436a-be61-5499f2e100f7")  # 从环境变量读取
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")  # 从环境变量读取
 client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
 
 @app.route('/wechat', methods=['GET', 'POST'])
